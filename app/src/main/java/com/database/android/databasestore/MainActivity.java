@@ -1,5 +1,6 @@
 package com.database.android.databasestore;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
         addItemFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Do nothing
+                Intent intent = new Intent(MainActivity.this, ItemEditor.class);
+                startActivity(intent);
             }
         });
     }
