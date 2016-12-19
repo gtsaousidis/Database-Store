@@ -7,9 +7,16 @@
     tools:context="com.database.android.databasestore.MainActivity">
 
         <TextView
-            android:id="@+id/text_view_pet"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/text_view_customer_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_margin"/>
+
+        <TextView
+            android:id="@+id/text_view_shop_item"
+            android:layout_below="@id/text_view_customer_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:padding="@dimen/activity_margin"/>
 
         <android.support.design.widget.FloatingActionButton

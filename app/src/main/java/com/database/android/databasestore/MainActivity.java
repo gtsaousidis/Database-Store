@@ -1,6 +1,9 @@
 package com.database.android.databasestore;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -8,8 +11,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+
+import com.database.android.databasestore.data.ItemContract;
+import com.database.android.databasestore.data.ItemDbHelper;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ItemDbHelper mDbHelper;
 
     // LOG_TAG string for logging reasons
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -28,6 +37,45 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        displayDatabaseInfo();
+    }
+
+    /** Temporary helper method to display info in the onScreen TextView about the state of the database */
+    private void displayDatabaseInfo() {
+
+        // To access the database instantiate the subclass of SQLiteOpenHelper
+        // and pass in the context, which is the current activity
+        mDbHelper = new ItemDbHelper(this);
+
+        // Create and/or open a database to read from
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        Cursor cursorCustomers = db.rawQuery("SELECT * FROM " + ItemContract.CustomersEntryProducts.TABLE_NAME, null);
+        Cursor cursorShop = db.rawQuery("SELECT * FROM " + ItemContract.ShopEntryContracts.TABLE_NAME, null);
+        try {
+            TextView displayTextView = (TextView) findViewById(R.id.text_view_customer_item);
+            TextView shopDisplayTextView = (TextView) findViewById(R.id.text_view_shop_item);
+            displayTextView.setText("Number of rows in the Customers Products table is " + cursorCustomers.getCount());
+            shopDisplayTextView.setText("Number of rows in the shop products table is " + cursorShop.getCount());
+        } finally {
+            cursorCustomers.close();
+            cursorShop.close();
+        }
+    }
+
+    private void insertCustomerProduct() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+
+        ContentValues values = new ContentValues();
+        values.put(ItemContract.CustomersEntryProducts.COLUMN_NAME, "Xiaomi Redmi 3 pro");
+        values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY, "Mobile Phone");
+        values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY, 1);
+        values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE, 160);
+        values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER, "Gearbest");
+
+        long newRowId = db.insert(ItemContract.CustomersEntryProducts.TABLE_NAME, null, values);
     }
 
     @Override
@@ -43,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "insert dummy data" option
             case R.id.insert_dummy_data:
-                // Do nothing
+                insertCustomerProduct();
                 return true;
             // Respond to a click on the "delete all entries" option
             case R.id.action_delete_all_entries:
