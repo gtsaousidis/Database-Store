@@ -19,7 +19,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ItemEditor"/>
+        <activity android:name=".ItemEditor"
+            android:label="Add Item"
+            android:parentActivityName=".MainActivity"/>
+        
+        <provider
+            android:authorities="com.database.android.databasestore"
+            android:name=".data.ItemProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
