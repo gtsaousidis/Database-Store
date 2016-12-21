@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,7 +21,6 @@ import android.widget.Toast;
 import com.database.android.databasestore.data.ItemContract;
 import com.database.android.databasestore.data.ItemDbHelper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -43,6 +41,8 @@ public class ItemEditor extends AppCompatActivity {
     private int mQuantity = 0;
 
     private ItemDbHelper mDbHelper;
+
+    private String path = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,10 +79,14 @@ public class ItemEditor extends AppCompatActivity {
         String productSupplier = mSupplierEditText.getText().toString().trim();
         String quantityProductString = mQuantityText.getText().toString().trim();
         int productQuantity = Integer.parseInt(quantityProductString);
+
+        /**
         Bitmap bitmap = ((BitmapDrawable)mImageView.getDrawable()).getBitmap();
+
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
         byte[] img = bos.toByteArray();
+         */
 
         ContentValues values = new ContentValues();
         values.put(ItemContract.CustomersEntryProducts.COLUMN_NAME, productName);
@@ -90,7 +94,7 @@ public class ItemEditor extends AppCompatActivity {
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE, productPrice);
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER, productSupplier);
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY, productQuantity);
-        values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE, img);
+        values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE, path);
 
         long newRowId = db.insert(ItemContract.CustomersEntryProducts.TABLE_NAME, null, values);
 
@@ -104,15 +108,17 @@ public class ItemEditor extends AppCompatActivity {
             case ACTIVITY_SELECT_IMAGE:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
+                    path = selectedImage.toString();
                     InputStream imageStream = null;
                     try {
                         imageStream = getContentResolver().openInputStream(selectedImage);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    Bitmap userSelectedImage = BitmapFactory.decodeStream(imageStream);
+                    Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
+
                     mEnterImageButton.setVisibility(View.GONE);
-                    mImageView.setImageBitmap(userSelectedImage);
+                    mImageView.setImageBitmap(yourSelectedImage);
                 }
         }
     }

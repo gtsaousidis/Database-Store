@@ -16,7 +16,7 @@ public class ItemDbHelper extends SQLiteOpenHelper {
             + ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE + " INTEGER NOT NULL DEFAULT 0, "
             + ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY + " INTEGER NOT NULL, "
             + ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER + " TEXT NOT NULL, "
-            + ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE + " BLOB);";
+            + ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE + " TEXT);";
 
     private static final String SQL_CREATE_SHOP_PRODUCTS_TABLE = "CREATE TABLE " + ItemContract.ShopEntryContracts.TABLE_NAME + "("
             + ItemContract.ShopEntryContracts._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "

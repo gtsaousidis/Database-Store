@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.database.android.databasestore.data.ItemContract;
@@ -51,20 +53,83 @@ public class MainActivity extends AppCompatActivity {
         // Create and/or open a database to read from
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        Cursor cursorCustomers = db.rawQuery("SELECT * FROM " + ItemContract.CustomersEntryProducts.TABLE_NAME, null);
-        Cursor cursorShop = db.rawQuery("SELECT * FROM " + ItemContract.ShopEntryContracts.TABLE_NAME, null);
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ItemContract.CustomersEntryProducts._ID,
+                ItemContract.CustomersEntryProducts.COLUMN_NAME,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE
+        };
+
+        Cursor cursor = db.query(
+                ItemContract.CustomersEntryProducts.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        TextView displayTextView = (TextView) findViewById(R.id.text_view_customer_item);
+
         try {
-            TextView displayTextView = (TextView) findViewById(R.id.text_view_customer_item);
-            TextView shopDisplayTextView = (TextView) findViewById(R.id.text_view_shop_item);
-            displayTextView.setText("Number of rows in the Customers Products table is " + cursorCustomers.getCount());
-            shopDisplayTextView.setText("Number of rows in the shop products table is " + cursorShop.getCount());
+
+            displayTextView.setText("Number of rows in the database table " + cursor.getCount());
+            displayTextView.append(ItemContract.CustomersEntryProducts._ID + " - " +
+                    ItemContract.CustomersEntryProducts.COLUMN_NAME + " - " +
+                    ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY + " - " +
+                    ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE + " - " +
+                    ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY + " - " +
+                    ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER + " - " +
+                    ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE);
+
+            int idColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts._ID);
+            int nameColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts.COLUMN_NAME);
+            int varietyColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY);
+            int priceColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE);
+            int quantityColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY);
+            int supplierColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER);
+            int photoColumnIndex = cursor.getColumnIndex(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE);
+
+            while (cursor.moveToNext()) {
+
+                int currentId = cursor.getInt(idColumnIndex);
+                String currentName = cursor.getString(nameColumnIndex);
+                String currentVariety = cursor.getString(varietyColumnIndex);
+                int currentPrice = cursor.getInt(priceColumnIndex);
+                int currentQuantity = cursor.getInt(quantityColumnIndex);
+                String currentSupplier = cursor.getString(supplierColumnIndex);
+                String blob = cursor.getString(photoColumnIndex);
+                Uri pictureUri = Uri.parse(blob);
+                ImageView image = (ImageView) findViewById(R.id.imageHolder);
+                image.setImageURI(pictureUri);
+                /**
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(blob);
+                Bitmap currentPicture = BitmapFactory.decodeStream(inputStream);
+                ImageView currentImageView = (ImageView) findViewById(R.id.imageHolder);
+                currentImageView.setImageBitmap(currentPicture);
+                 */
+
+                displayTextView.append(("\n" + currentId + " - " +
+                        currentName + " - " +
+                        currentVariety + " - " +
+                        currentPrice + " - " +
+                        currentQuantity + " - " +
+                        currentSupplier + " - " ));
+            }
         } finally {
-            cursorCustomers.close();
-            cursorShop.close();
+            cursor.close();
         }
     }
 
     private void insertCustomerProduct() {
+        mDbHelper = new ItemDbHelper(this);
+
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
 
