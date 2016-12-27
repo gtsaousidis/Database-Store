@@ -46,13 +46,6 @@ public class MainActivity extends AppCompatActivity {
     /** Temporary helper method to display info in the onScreen TextView about the state of the database */
     private void displayDatabaseInfo() {
 
-        // To access the database instantiate the subclass of SQLiteOpenHelper
-        // and pass in the context, which is the current activity
-        mDbHelper = new ItemDbHelper(this);
-
-        // Create and/or open a database to read from
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -65,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE
         };
 
+        /**
         Cursor cursor = db.query(
                 ItemContract.CustomersEntryProducts.TABLE_NAME,
                 projection,
@@ -74,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 null
         );
+         */
+
+        Cursor cursor = getContentResolver().query(ItemContract.CustomersEntryProducts.CONTENT_URI, projection, null, null, null);
+
 
         TextView displayTextView = (TextView) findViewById(R.id.text_view_customer_item);
 
