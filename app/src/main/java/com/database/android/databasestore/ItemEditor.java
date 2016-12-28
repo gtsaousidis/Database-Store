@@ -98,11 +98,11 @@ public class ItemEditor extends AppCompatActivity {
         // Show a toast message depending on whether or not the insertion was successful
         if (newUri == null) {
             // If the new content URI is null, then there was an error with insertion.
-            Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+            Toast.makeText(this, getString(R.string.editor_insert_item_failed),
                     Toast.LENGTH_SHORT).show();
         } else {
             // Otherwise, the insertion was successful and we can display a toast.
-            Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+            Toast.makeText(this, getString(R.string.editor_insert_item_successful),
                     Toast.LENGTH_SHORT).show();
         }
     }

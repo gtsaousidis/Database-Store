@@ -55,6 +55,25 @@ public class ItemProvider extends ContentProvider {
      */
     private Uri insertItem(Uri uri, ContentValues values) {
 
+        // Check that the name is not null
+        String name = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_NAME);
+        String variety = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY);
+        String supplier = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER);
+        if (name == null) {
+            throw new IllegalArgumentException("Item must have a name and variety ");
+        }
+
+        Integer price = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE);
+        Integer quantity = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY);
+        if (price != null && price < 0 ) {
+            throw new IllegalArgumentException("Item requires valid price!");
+        }
+
+        if (quantity != null && quantity < 0) {
+            throw new IllegalArgumentException("Item requires valid quantity!");
+        }
+
+
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // Insert the new item with the given values
@@ -105,8 +124,62 @@ public class ItemProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case ITEMS:
+                return updateItem(uri, contentValues, selection, selectionArgs);
+            case ITEM_ID:
+                // For the PET_ID code, extract out the ID from the URI,
+                // so we know which row to update. Selection will be "_id=?" and selection
+                // arguments will be a String array containing the actual ID.
+                selection = ItemContract.CustomersEntryProducts._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updateItem(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
+        }
+    }
+
+    private int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        // If the {@link CustomersEntryProducts#COLUMN_NAME} key is present,
+        // check that the name value is not null.
+        if (values.containsKey(ItemContract.CustomersEntryProducts.COLUMN_NAME)) {
+            String name = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Item requires a name");
+            }
+        }
+
+        // If the {@link CustomersEntryProducts#COLUMN_PRICE} key is present,
+        // check that the price value is valid.
+        if (values.containsKey(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE)) {
+            Integer price = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE);
+            if (price != null && price < 0) {
+                throw new IllegalArgumentException("Item requires valid price");
+            }
+        }
+
+        // If the {@link CustomersEntryProducts#COLUMN_QUANTITY} key is present,
+        // check that the quantity value is valid.
+        if (values.containsKey(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY)) {
+            // Check that the quantity is greater than or equal to 0 kg
+            Integer quantity = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY);
+            if (quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("Item requires valid quantity");
+            }
+        }
+
+        // If there are no values to update, then don't try to update the database
+        if (values.size() == 0) {
+            return 0;
+        }
+
+        // Otherwise, get writeable database to update the data
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Returns the number of database rows affected by the update statement
+        return database.update(ItemContract.CustomersEntryProducts.TABLE_NAME, values, selection, selectionArgs);
     }
 
     @Nullable
