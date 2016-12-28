@@ -6,24 +6,10 @@
     android:layout_height="match_parent"
     tools:context="com.database.android.databasestore.MainActivity">
 
-        <TextView
-            android:id="@+id/text_view_customer_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/activity_margin"/>
-
-        <ImageView
-            android:id="@+id/imageHolder"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_below="@id/text_view_customer_item"/>
-
-        <TextView
-            android:id="@+id/text_view_shop_item"
-            android:layout_below="@id/text_view_customer_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/activity_margin"/>
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

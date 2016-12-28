@@ -119,8 +119,23 @@ public class ItemProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        // Get writeable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case ITEMS:
+                // Delete all rows that match the selection and selection args
+                return database.delete(ItemContract.CustomersEntryProducts.TABLE_NAME, selection, selectionArgs);
+            case ITEM_ID:
+                // Delete a single row given by the ID in the URI
+                selection = ItemContract.CustomersEntryProducts._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return database.delete(ItemContract.CustomersEntryProducts.TABLE_NAME, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+        }
     }
 
     @Override
@@ -185,6 +200,14 @@ public class ItemProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(Uri uri) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case ITEMS:
+                return ItemContract.CustomersEntryProducts.CONTENT_LIST_TYPE;
+            case ITEM_ID:
+                return ItemContract.CustomersEntryProducts.CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
     }
+}
 }
