@@ -12,6 +12,8 @@ import android.util.Log;
 
 public class ItemProvider extends ContentProvider {
 
+    private static final String LOG_TAG = ItemProvider.class.getSimpleName();
+
     private ItemDbHelper mDbHelper;
 
     private static final int ITEMS = 100;
@@ -38,7 +40,34 @@ public class ItemProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case ITEMS:
+                return insertItem(uri, contentValues);
+            default:
+                throw new IllegalArgumentException("Insertion is not supported for" + uri);
+        }
+    }
+
+    /**
+     * Insert an item into the database with the given content values. Return the new content URI
+     * for that specific row in the database.
+     */
+    private Uri insertItem(Uri uri, ContentValues values) {
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Insert the new item with the given values
+        long id = db.insert(ItemContract.CustomersEntryProducts.TABLE_NAME, null, values);
+        // If the ID is -1, then the insertion failed. Log an error and return null.
+        if (id == -1) {
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        }
+
+        // Once we know the ID of the new row in the table,
+        // return the new URI with the ID appended to the end of it
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Nullable

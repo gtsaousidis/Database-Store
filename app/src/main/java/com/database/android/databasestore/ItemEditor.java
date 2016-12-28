@@ -2,7 +2,6 @@ package com.database.android.databasestore;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -69,8 +68,6 @@ public class ItemEditor extends AppCompatActivity {
     }
 
     private void insertPet() {
-        mDbHelper = new ItemDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String productName = mNameEditText.getText().toString().trim();
         String productVariety = mVarietyEditText.getText().toString().trim();
@@ -96,9 +93,18 @@ public class ItemEditor extends AppCompatActivity {
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY, productQuantity);
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE, path);
 
-        long newRowId = db.insert(ItemContract.CustomersEntryProducts.TABLE_NAME, null, values);
+        Uri newUri = getContentResolver().insert(ItemContract.CustomersEntryProducts.CONTENT_URI, values);
 
-        Toast.makeText(getApplicationContext(), "Item inserted in database with id " + newRowId, Toast.LENGTH_LONG).show();
+        // Show a toast message depending on whether or not the insertion was successful
+        if (newUri == null) {
+            // If the new content URI is null, then there was an error with insertion.
+            Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            // Otherwise, the insertion was successful and we can display a toast.
+            Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {

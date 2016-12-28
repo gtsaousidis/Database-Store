@@ -36,6 +36,10 @@
     <string name="action_save">Save item</string>
     <!-- Title Action delete item -->
     <string name="action_delete">Delete item</string>
+    <!-- Toast message in editor when new item has been successfully inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_item_successful">Item saved</string>
+    <!-- Toast message in editor when new item has failed to be inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_item_failed">Error with saving Item</string>
 
 
 

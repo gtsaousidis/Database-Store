@@ -3,7 +3,6 @@ package com.database.android.databasestore;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -126,10 +125,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void insertCustomerProduct() {
-        mDbHelper = new ItemDbHelper(this);
-
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
 
         ContentValues values = new ContentValues();
         values.put(ItemContract.CustomersEntryProducts.COLUMN_NAME, "Xiaomi Redmi 3 pro");
@@ -138,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE, 160);
         values.put(ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER, "Gearbest");
 
-        long newRowId = db.insert(ItemContract.CustomersEntryProducts.TABLE_NAME, null, values);
+        Uri newUri = getContentResolver().insert(ItemContract.CustomersEntryProducts.CONTENT_URI, values);
     }
 
     @Override
