@@ -1,6 +1,8 @@
 package com.database.android.databasestore;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,15 +13,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.database.android.databasestore.data.ItemContract;
 import com.database.android.databasestore.data.ItemCursorAdapter;
-import com.database.android.databasestore.data.ItemDbHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ItemDbHelper mDbHelper;
+    ItemCursorAdapter mCursorAdapter;
+
+    private static final int ITEM_LOADER = 0;
 
     // LOG_TAG string for logging reasons
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -39,31 +43,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        displayDatabaseInfo();
-    }
-
-    /** Temporary helper method to display info in the onScreen TextView about the state of the database */
-    private void displayDatabaseInfo() {
-
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
-        String[] projection = {
-                ItemContract.CustomersEntryProducts._ID,
-                ItemContract.CustomersEntryProducts.COLUMN_NAME,
-                ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY,
-                ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE,
-                ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY,
-                ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER,
-                ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE
-        };
-
-        Cursor cursor = getContentResolver().query(ItemContract.CustomersEntryProducts.CONTENT_URI, projection, null, null, null);
-
+        View emptyView = findViewById(R.id.empty_view);
         ListView listItems = (ListView) findViewById(R.id.list);
+        listItems.setEmptyView(emptyView);
 
-        ItemCursorAdapter adapter = new ItemCursorAdapter(this, cursor);
+        mCursorAdapter = new ItemCursorAdapter(this, null);
+        listItems.setAdapter(mCursorAdapter);
 
-        listItems.setAdapter(adapter);
+        listItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    Intent intent = new Intent(MainActivity.this, ItemEditor.class);
+
+                    //
+                    Uri currentPetUri = ContentUris.withAppendedId(ItemContract.CustomersEntryProducts.CONTENT_URI, id);
+                    intent.setData(currentPetUri);
+                    startActivity(intent);
+            }
+        });
+
+        getLoaderManager().initLoader(ITEM_LOADER, null, this);
+
 
     }
 
@@ -104,5 +104,33 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    @Override
+    public android.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = {
+                ItemContract.CustomersEntryProducts._ID,
+                ItemContract.CustomersEntryProducts.COLUMN_NAME,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY,
+                ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE
+        };
+
+        return new CursorLoader(this,
+                ItemContract.CustomersEntryProducts.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor) {
+            mCursorAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<Cursor> loader) {
+            mCursorAdapter.swapCursor(null);
     }
 }

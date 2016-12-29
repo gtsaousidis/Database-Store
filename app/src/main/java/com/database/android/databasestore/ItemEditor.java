@@ -48,6 +48,17 @@ public class ItemEditor extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
+        Intent intent = getIntent();
+        Uri currentPetUri = intent.getData();
+
+        if (currentPetUri == null) {
+            // This is a new item so change the label to "Add an item"
+            setTitle("Add an item");
+        } else {
+            // Otherwise this is an existing item so the label must be "Edit item"
+            setTitle("Edit item");
+        }
+
         // Find all the relevant views that is used to read input from user
         mNameEditText = (EditText) findViewById(R.id.edit_item_name);
         mVarietyEditText = (EditText) findViewById(R.id.edit_item_variety);

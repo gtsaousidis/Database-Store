@@ -82,6 +82,8 @@ public class ItemProvider extends ContentProvider {
         if (id == -1) {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
+        } else {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
 
         // Once we know the ID of the new row in the table,
@@ -115,6 +117,8 @@ public class ItemProvider extends ContentProvider {
                 cursor = database.query(ItemContract.CustomersEntryProducts.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
         }
+
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
@@ -122,17 +126,30 @@ public class ItemProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        int rowsDeleted;
 
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case ITEMS:
                 // Delete all rows that match the selection and selection args
-                return database.delete(ItemContract.CustomersEntryProducts.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted =  database.delete(ItemContract.CustomersEntryProducts.TABLE_NAME, selection, selectionArgs);
+                // If 1 or more rows were deleted, then notify all listeners that the data at the
+                // given URI has changed
+                if (rowsDeleted != 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return rowsDeleted;
             case ITEM_ID:
                 // Delete a single row given by the ID in the URI
                 selection = ItemContract.CustomersEntryProducts._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
-                return database.delete(ItemContract.CustomersEntryProducts.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted =  database.delete(ItemContract.CustomersEntryProducts.TABLE_NAME, selection, selectionArgs);
+                // If 1 or more rows were deleted, then notify all listeners that the data at the
+                // given URI has changed
+                if (rowsDeleted != 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return rowsDeleted;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
@@ -194,7 +211,15 @@ public class ItemProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Returns the number of database rows affected by the update statement
-        return database.update(ItemContract.CustomersEntryProducts.TABLE_NAME, values, selection, selectionArgs);
+        int rowsUpdated = database.update(ItemContract.CustomersEntryProducts.TABLE_NAME, values, selection, selectionArgs);
+
+        // If 1 or more rows were updated, then notify all listeners that the data at the
+        // given URI has changed
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsUpdated;
     }
 
     @Nullable

@@ -28,11 +28,13 @@ public class ItemCursorAdapter extends CursorAdapter {
         TextView tvName = (TextView) view.findViewById(R.id.name);
         TextView tvVariety = (TextView) view.findViewById(R.id.variety);
         ImageView imgItem = (ImageView) view.findViewById(R.id.image_item);
-
+        Uri imageUri = null;
         String name = cursor.getString(cursor.getColumnIndexOrThrow(ItemContract.CustomersEntryProducts.COLUMN_NAME));
         String variety = cursor.getString(cursor.getColumnIndexOrThrow(ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY));
         String photo = cursor.getString(cursor.getColumnIndexOrThrow(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE));
-        Uri imageUri = Uri.parse(photo);
+        if (photo != null) {
+            imageUri = Uri.parse(photo);
+        }
 
         tvName.setText(name);
         tvVariety.setText(variety);
