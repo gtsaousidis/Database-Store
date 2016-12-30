@@ -2,6 +2,7 @@ package com.database.android.databasestore;
 
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -10,10 +11,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +34,9 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
     private final static int ACTIVITY_SELECT_IMAGE = 100;
 
     private static final int ITEM_LOADER = 0;
+
+    // This will be true if the user updates part of the item form
+    private boolean mHasItemChanged;
 
     // EditText for entering name, variety, price and supplier
     private EditText mNameEditText, mVarietyEditText, mPriceEditText, mSupplierEditText, mQuantityText;
@@ -51,6 +57,14 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
     // The uri that is returned for a specific item frm the list through the intent's data
     private Uri currentItemUri;
 
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mHasItemChanged = true;
+            return false;
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +76,7 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
         if (currentItemUri == null) {
             // This is a new item so change the label to "Add an item"
             setTitle("Add an item");
+            invalidateOptionsMenu();
         } else {
             // Otherwise this is an existing item so the label must be "Edit item"
             setTitle("Edit item");
@@ -71,11 +86,17 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
 
         // Find all the relevant views that is used to read input from user
         mNameEditText = (EditText) findViewById(R.id.edit_item_name);
+        mNameEditText.setOnTouchListener(mTouchListener);
         mVarietyEditText = (EditText) findViewById(R.id.edit_item_variety);
+        mVarietyEditText.setOnTouchListener(mTouchListener);
         mPriceEditText = (EditText) findViewById(R.id.edit_item_price);
+        mPriceEditText.setOnTouchListener(mTouchListener);
         mSupplierEditText = (EditText) findViewById(R.id.edit_item_supplier);
+        mSupplierEditText.setOnTouchListener(mTouchListener);
         mQuantityText = (EditText) findViewById(R.id.edit_quantity_item);
+        mQuantityText.setOnTouchListener(mTouchListener);
         mEnterImageButton = (Button) findViewById(R.id.insert_image_button);
+        mEnterImageButton.setOnTouchListener(mTouchListener);
         mImageView = (ImageView) findViewById(R.id.edit_item_image);
 
         mEnterImageButton.setOnClickListener(new View.OnClickListener() {
@@ -181,7 +202,49 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
         }
     }
 
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Keep editing" button, so dismiss the dialog
+                // and continue editing the item.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+    }
+
     @Override
+    public void onBackPressed() {
+        // If the item hasn't changed, continue with handling back button press
+        if (!mHasItemChanged) {
+            super.onBackPressed();
+            return;
+        }
+
+        // Otherwise if there are unsaved changes, setup a dialog to warn the user.
+        // Create a click listener to handle the user confirming that changes should be discarded.
+        DialogInterface.OnClickListener discardButtonClickListener =
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // User clicked "Discard" button, close the current activity.
+                        finish();
+                    }
+                };
+
+        // Show dialog that there are unsaved changes
+        showUnsavedChangesDialog(discardButtonClickListener);
+    }
+
+
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_editor, menu);
         return true;
@@ -196,11 +259,42 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
             case R.id.action_delete:
                 return true;
             case R.id.home:
-                // Navigate back to the parent activity
-                NavUtils.navigateUpFromSameTask(this);
+                // If the item hasn't changed, continue with navigating up to parent activity
+                // which is the {@link CatalogActivity}.
+                if (!mHasItemChanged) {
+                    NavUtils.navigateUpFromSameTask(ItemEditor.this);
+                    return true;
+                }
+
+                // Otherwise if there are unsaved changes, setup a dialog to warn the user.
+                // Create a click listener to handle the user confirming that
+                // changes should be discarded.
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // User clicked "Discard" button, navigate to parent activity.
+                                NavUtils.navigateUpFromSameTask(ItemEditor.this);
+                            }
+                        };
+
+                // Show a dialog that notifies the user they have unsaved changes
+                showUnsavedChangesDialog(discardButtonClickListener);
                 return true;
+
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        // If this is a new pet, hide the "Delete" menu item.
+        if (currentItemUri == null) {
+            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            menuItem.setVisible(false);
+        }
+        return true;
     }
 
 
