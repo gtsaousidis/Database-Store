@@ -46,6 +46,9 @@
 
     <!-- Subtitle text for the empty view that prompts the user to add a pet [CHAR LIMIT=50] -->
     <string name="empty_view_subtitle_text">Get started by adding an item</string>
+    
+    <string name="editor_update_item_failed">Error with updating item</string>
+    <string name="editor_update_item_successfull">You successfully updated an item</string>
 
 
 
