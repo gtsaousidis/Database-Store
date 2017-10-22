@@ -20,13 +20,8 @@ import com.database.android.databasestore.data.ItemContract;
 import com.database.android.databasestore.data.ItemCursorAdapter;
 
 public class MainActivity extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
-
     ItemCursorAdapter mCursorAdapter;
-
     private static final int ITEM_LOADER = 0;
-
-    // LOG_TAG string for logging reasons
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements android.app.Loade
         setContentView(R.layout.activity_main);
 
         FloatingActionButton addItemFab = (FloatingActionButton) findViewById(R.id.fab);
-
         addItemFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements android.app.Loade
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     @Override
     public android.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
