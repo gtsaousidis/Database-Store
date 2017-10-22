@@ -54,6 +54,9 @@
     <string name="discard">Discard</string>
     <string name="keep_editing">Keep Editing</string>
 
+    <string name="add_time">"Add an item"</string>
+    <string name="edit_item">"Edit item"</string>
+
 
 
 

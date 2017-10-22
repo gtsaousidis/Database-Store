@@ -29,6 +29,8 @@ import com.database.android.databasestore.data.ItemDbHelper;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ItemEditor extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static int ACTIVITY_SELECT_IMAGE = 100;
@@ -75,12 +77,11 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
 
         if (currentItemUri == null) {
             // This is a new item so change the label to "Add an item"
-            setTitle("Add an item");
+            setTitle(R.string.edit_item);
             invalidateOptionsMenu();
         } else {
             // Otherwise this is an existing item so the label must be "Edit item"
-            setTitle("Edit item");
-
+            setTitle(R.string.edit_item);
             getLoaderManager().initLoader(ITEM_LOADER, null, this);
         }
 
@@ -300,7 +301,6 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
 
     @Override
     public android.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-
         String[] projection = {ItemContract.CustomersEntryProducts._ID,
                 ItemContract.CustomersEntryProducts.COLUMN_NAME,
                 ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY,
@@ -308,8 +308,6 @@ public class ItemEditor extends AppCompatActivity implements android.app.LoaderM
                 ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE,
                 ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER,
                 ItemContract.CustomersEntryProducts.COLUMN_ITEM_PICTURE};
-
-
         return new CursorLoader(this, currentItemUri, projection, null, null, null);
     }
 

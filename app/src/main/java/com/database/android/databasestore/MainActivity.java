@@ -63,8 +63,6 @@ public class MainActivity extends AppCompatActivity implements android.app.Loade
         });
 
         getLoaderManager().initLoader(ITEM_LOADER, null, this);
-
-
     }
 
     private void insertCustomerProduct() {
