@@ -11,5 +11,7 @@ public class DataStoreConstants {
         public final static String itemRequiresValisPrice = "Item requires valid price!";
         public final static String itemRequiresName = "Item requires a name";
         public final static String itemMustHaveVarietyAndName = "Item must have a name and variety";
+        public final static String deletionNotSupportedFor ="Deletion is not supported for ";
+        public final static String updateNotSupportedFor = "Update is not supported for ";
     }
 }

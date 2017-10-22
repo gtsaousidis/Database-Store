@@ -155,7 +155,7 @@ public class ItemProvider extends ContentProvider {
                 }
                 return rowsDeleted;
             default:
-                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+                throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.deletionNotSupportedFor + uri);
         }
     }
 
@@ -173,7 +173,7 @@ public class ItemProvider extends ContentProvider {
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 return updateItem(uri, contentValues, selection, selectionArgs);
             default:
-                throw new IllegalArgumentException("Update is not supported for " + uri);
+                throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.updateNotSupportedFor + uri);
         }
     }
 
