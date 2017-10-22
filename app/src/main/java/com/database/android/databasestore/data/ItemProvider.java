@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.database.android.databasestore.DataStoreConstants;
+
 public class ItemProvider extends ContentProvider {
 
     private static final String LOG_TAG = ItemProvider.class.getSimpleName();
@@ -61,17 +63,17 @@ public class ItemProvider extends ContentProvider {
         String variety = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_ITEM_VARIETY);
         String supplier = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_ITEM_SUPPLIER);
         if (name == null) {
-            throw new IllegalArgumentException("Item must have a name and variety ");
+            throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.itemMustHaveVarietyAndName);
         }
 
         Integer price = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE);
         Integer quantity = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY);
         if (price != null && price < 0 ) {
-            throw new IllegalArgumentException("Item requires valid price!");
+            throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.itemRequiresValisPrice);
         }
 
         if (quantity != null && quantity < 0) {
-            throw new IllegalArgumentException("Item requires valid quantity!");
+            throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.itemRequiresValisQuantity);
         }
 
 
@@ -181,7 +183,7 @@ public class ItemProvider extends ContentProvider {
         if (values.containsKey(ItemContract.CustomersEntryProducts.COLUMN_NAME)) {
             String name = values.getAsString(ItemContract.CustomersEntryProducts.COLUMN_NAME);
             if (name == null) {
-                throw new IllegalArgumentException("Item requires a name");
+                throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.itemRequiresName);
             }
         }
 
@@ -190,7 +192,7 @@ public class ItemProvider extends ContentProvider {
         if (values.containsKey(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE)) {
             Integer price = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_PRICE);
             if (price != null && price < 0) {
-                throw new IllegalArgumentException("Item requires valid price");
+                throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.itemRequiresValisPrice);
             }
         }
 
@@ -200,7 +202,7 @@ public class ItemProvider extends ContentProvider {
             // Check that the quantity is greater than or equal to 0 kg
             Integer quantity = values.getAsInteger(ItemContract.CustomersEntryProducts.COLUMN_ITEM_QUANTITY);
             if (quantity != null && quantity < 0) {
-                throw new IllegalArgumentException("Item requires valid quantity");
+                throw new IllegalArgumentException(DataStoreConstants.ErrorStrings.itemRequiresValisQuantity);
             }
         }
 
